@@ -1,18 +1,28 @@
-export function convertUserMessage(message: string) {
-  // TEMP LOGIC — you'll replace this later
-  return `You said: ${message}. (Size conversion coming soon.)`;
-}
+// Chat Message Handler
 
-export function convertSize(
-  brand: string,
-  size: string | number,
-  targetBrand?: string
-) {
-  return {
-    universal: "M",
-    convertedBrands: {
-      Puma: 8,
-      Adidas: 8.5,
-    },
-  };
+import { parseMessage } from "./parser";
+import { convertSize } from "./engine";
+
+export function convertUserMessage(message: string) {
+  const { brand, size } = parseMessage(message);
+
+  if (!brand || !size) {
+    return "Please tell me your brand and size (e.g., Nike size 9).";
+  }
+
+  const result = convertSize(brand, size);
+
+  if ((result as any).error) {
+    return (result as any).error;
+  }
+
+  return `
+Based on your ${brand} size ${size}:
+Your universal size is **${result.universal}**.
+
+Equivalent sizes:
+${Object.entries(result.convertedBrands)
+  .map(([b, s]) => `- **${b}**: ${s}`)
+  .join("\n")}
+  `;
 }
