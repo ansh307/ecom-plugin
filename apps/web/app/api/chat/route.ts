@@ -1,8 +1,13 @@
 // POST /api/chat
 
-import { NextResponse } from "next/server";
+import { corsResponse, corsPreflight } from "../../../lib/cors";
 import { convertUserMessage } from "@repo/size-engine";
 import { validateStore } from "@repo/core";
+
+export async function OPTIONS() {
+  // Required for browser preflight (CORS)
+  return corsPreflight();
+}
 
 export async function POST(req: Request) {
   try {
@@ -10,27 +15,21 @@ export async function POST(req: Request) {
     const { storeId, message } = body;
 
     if (!storeId || !message) {
-      return NextResponse.json(
-        { error: "Missing storeId or message" },
-        { status: 400 }
-      );
+      return corsResponse({ error: "Missing storeId or message" }, 400);
     }
 
     // Validate store
     const store = await validateStore(storeId);
     if (!store) {
-      return NextResponse.json({ error: "Invalid storeId" }, { status: 403 });
+      return corsResponse({ error: "Invalid storeId" }, 403);
     }
 
     // Convert using size engine
     const reply = await convertUserMessage(message);
 
-    return NextResponse.json({ reply });
+    return corsResponse({ reply });
   } catch (err) {
     console.error("Chat API Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return corsResponse({ error: "Internal server error" }, 500);
   }
 }
