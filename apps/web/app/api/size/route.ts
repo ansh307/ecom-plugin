@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const result = convertSize(brand, size, targetBrand);
+    const result = convertSize(brand, size);
 
     return NextResponse.json(result);
   } catch (err) {

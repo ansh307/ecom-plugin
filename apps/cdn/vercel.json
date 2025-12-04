@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/plugin.v1.js",
+      "dest": "/dist/plugin.v1.js"
+    }
+  ],
+  "public": true
+}
