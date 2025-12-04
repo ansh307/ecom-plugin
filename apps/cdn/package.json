@@ -1,5 +1,12 @@
 {
+  "name": "cdn-build",
+  "private": true,
+  "scripts": {
+    "dev": "esbuild src/index.js --bundle --outfile=dist/plugin.v1.js --watch",
+    "build": "esbuild src/index.js --bundle --minify --outfile=dist/plugin.v1.js"
+  },
+  "dependencies": {},
   "devDependencies": {
-    "esbuild": "^0.27.0"
+    "esbuild": "latest"
   }
 }
