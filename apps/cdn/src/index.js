@@ -317,8 +317,8 @@
     const bubble = createElement(
       "div",
       {
-        background: "#111827",
-        color: "#f9fafb",
+        background: BOT_BG,
+        color: BOT_TEXT,
         padding: "8px 10px",
         borderRadius: "10px",
         borderTopLeftRadius: "2px",
