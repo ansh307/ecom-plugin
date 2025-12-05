@@ -223,6 +223,26 @@
     { id: WIDGET_ID_PREFIX + "chat" }
   );
 
+  let BOT_BG = "#111827";
+  let BOT_TEXT = "#ffffff";
+  let USER_BG = "#e5e7eb";
+  let USER_TEXT = "#111827";
+
+  function lightenColor(hex, percent) {
+    hex = hex.replace("#", "");
+    const num = parseInt(hex, 16);
+
+    let r = (num >> 16) + percent;
+    let g = ((num >> 8) & 0x00ff) + percent;
+    let b = (num & 0x0000ff) + percent;
+
+    r = r < 255 ? r : 255;
+    g = g < 255 ? g : 255;
+    b = b < 255 ? b : 255;
+
+    return "#" + (g | (b << 8) | (r << 16)).toString(16);
+  }
+
   // initial message
   function addBotMessage(text) {
     const msg = createElement(
@@ -236,8 +256,8 @@
     const bubble = createElement(
       "div",
       {
-        background: "#111827",
-        color: "#f9fafb",
+        background: BOT_BG,
+        color: BOT_TEXT,
         padding: "8px 10px",
         borderRadius: "10px",
         borderTopLeftRadius: "2px",
@@ -246,6 +266,7 @@
       },
       { text }
     );
+
     msg.appendChild(bubble);
     chatContainer.appendChild(msg);
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -264,8 +285,8 @@
     const bubble = createElement(
       "div",
       {
-        background: "#e5e7eb",
-        color: "#111827",
+        background: USER_BG,
+        color: USER_TEXT,
         padding: "8px 10px",
         borderRadius: "10px",
         borderTopRightRadius: "2px",
@@ -274,6 +295,7 @@
       },
       { text }
     );
+
     msg.appendChild(bubble);
     chatContainer.appendChild(msg);
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -492,24 +514,27 @@
     // Floating button
     button.style.background = color;
 
-    // Header background
+    // Header
     header.style.background = color;
     titleLine.style.color = "#ffffff";
     subtitleLine.style.color = "rgba(255,255,255,0.8)";
-
-    // Close button icon color
     closeBtn.querySelector("svg").setAttribute("stroke", "#ffffff");
 
     // Send button
     sendBtn.style.background = color;
 
-    // Input focus border override
+    // Update chat theme variables
+    BOT_BG = color;
+    BOT_TEXT = "#ffffff";
+
+    // User bubble = light version of theme
+    USER_BG = lightenColor(color, 80); // custom function we add below
+    USER_TEXT = "#111827";
+
+    // Input focus highlight
     input.addEventListener("focus", () => {
       input.style.borderColor = color;
     });
-
-    // Optional: bot message bubbles
-    // botBubble.style.background = color; // modify your bubble creator if needed
   }
 
   // 12. Optional: fetch store settings (colors, text, etc.) later
