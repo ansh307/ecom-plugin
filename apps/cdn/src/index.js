@@ -442,12 +442,12 @@
 
     // Show widget after settings load
     button.style.display = "flex";
-  })();
 
-  // Greeting
-  addBotMessage(
-    "Hi! Tell me which brand and size fits you well.\nFor example: “Nike size 9 fits me well”."
-  );
+    // Greeting
+    addBotMessage(
+      "Hi! Tell me which brand and size fits you well.\nFor example: “Nike size 9 fits me well”."
+    );
+  })();
 
   // 10. Toggle modal visibility
   function toggleModal() {
