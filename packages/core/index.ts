@@ -1,18 +1,37 @@
 export * from "./stores";
 
+import { supabase } from "./supabase";
+
 export async function validateStore(storeId: string) {
-  // Replace with Supabase lookup later
-  return { storeId };
+  const { data, error } = await supabase
+    .from("stores")
+    .select("id, enabled")
+    .eq("id", storeId)
+    .single();
+
+  if (error || !data) return null;
+
+  return {
+    id: data.id,
+    enabled: data.enabled,
+  };
 }
 
 export async function getStoreSettings(storeId: string) {
-  // MOCK FOR NOW — later replace with DB call (Supabase/Postgres)
+  const { data, error } = await supabase
+    .from("stores")
+    .select("id, enabled, theme_color, title, subtitle, default_brand")
+    .eq("id", storeId)
+    .single();
+
+  if (error || !data) return null;
+
   return {
-    storeId,
-    enabled: true,
-    themeColor: "#111827",
-    title: "Size Assistant",
-    subtitle: "Tell me what fits you well.",
-    defaultBrand: "Nike",
+    storeId: data.id,
+    enabled: data.enabled,
+    themeColor: data.theme_color,
+    title: data.title,
+    subtitle: data.subtitle,
+    defaultBrand: data.default_brand,
   };
 }

@@ -7,9 +7,9 @@ export default function StoreSettingsForm({ store }: { store: any }) {
   const [subtitle, setSubtitle] = useState(
     store.subtitle ?? "Tell me what fits you well."
   );
-  const [themeColor, setThemeColor] = useState(store.themeColor ?? "#111827");
+  const [themeColor, setThemeColor] = useState(store.theme_color ?? "#111827");
   const [defaultBrand, setDefaultBrand] = useState(
-    store.defaultBrand ?? "Nike"
+    store.default_brand ?? "Nike"
   );
   const [enabled, setEnabled] = useState<boolean>(store.enabled);
   const [saving, setSaving] = useState(false);

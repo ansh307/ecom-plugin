@@ -144,7 +144,8 @@
     "div",
     {
       padding: "12px 16px",
-      background: "#f5f5f5",
+      background: "#f5f5f5", // will be overridden
+      color: "#111827", // overridden too
       borderBottom: "1px solid #e5e5e5",
       display: "flex",
       alignItems: "center",
@@ -407,8 +408,7 @@
 
     // APPLY THEME COLOR
     const theme = settings.themeColor || "#111827";
-    button.style.background = theme;
-    button.style.display = "flex";
+    applyThemeColor(theme);
 
     // APPLY TITLE / SUBTITLE
     titleLine.textContent = settings.title || "Size Assistant";
@@ -487,6 +487,30 @@
   sendBtn.addEventListener("click", () => {
     sendMessage();
   });
+
+  function applyThemeColor(color) {
+    // Floating button
+    button.style.background = color;
+
+    // Header background
+    header.style.background = color;
+    titleLine.style.color = "#ffffff";
+    subtitleLine.style.color = "rgba(255,255,255,0.8)";
+
+    // Close button icon color
+    closeBtn.querySelector("svg").setAttribute("stroke", "#ffffff");
+
+    // Send button
+    sendBtn.style.background = color;
+
+    // Input focus border override
+    input.addEventListener("focus", () => {
+      input.style.borderColor = color;
+    });
+
+    // Optional: bot message bubbles
+    // botBubble.style.background = color; // modify your bubble creator if needed
+  }
 
   // 12. Optional: fetch store settings (colors, text, etc.) later
   // You can extend this part to call `${apiBase}/store?storeId=${storeId}`
