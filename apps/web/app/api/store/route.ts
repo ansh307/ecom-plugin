@@ -1,7 +1,11 @@
-// get store config, token validation
+// apps/web/src/app/api/store/route.ts
 
-import { NextResponse } from "next/server";
+import { corsResponse, corsPreflight } from "../../../lib/cors";
 import { getStoreSettings } from "@repo/core";
+
+export async function OPTIONS() {
+  return corsPreflight();
+}
 
 export async function GET(req: Request) {
   try {
@@ -9,21 +13,17 @@ export async function GET(req: Request) {
     const storeId = searchParams.get("storeId");
 
     if (!storeId) {
-      return NextResponse.json({ error: "Missing storeId" }, { status: 400 });
+      return corsResponse({ error: "Missing storeId" }, 400);
     }
 
     const settings = await getStoreSettings(storeId);
-
     if (!settings) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 });
+      return corsResponse({ error: "Store not found" }, 404);
     }
 
-    return NextResponse.json(settings);
-  } catch (err) {
-    console.error("Store API Error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return corsResponse(settings);
+  } catch (error) {
+    console.error("Store API Error:", error);
+    return corsResponse({ error: "Internal server error" }, 500);
   }
 }

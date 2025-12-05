@@ -21,16 +21,27 @@
   const scriptSrc = currentScript.src || "";
   const url = new URL(scriptSrc, window.location.origin);
 
-  const storeId =
-    currentScript.getAttribute("data-store") ||
-    url.searchParams.get("storeId") ||
-    null;
+  const storeId = currentScript.getAttribute("data-store");
 
   const apiBase =
     currentScript.getAttribute("data-api-base") ||
     url.searchParams.get("apiBase") ||
     // fallback: same-origin /api
     window.location.origin + "/api";
+
+  async function fetchStoreSettings() {
+    try {
+      const res = await fetch(
+        apiBase.replace(/\/$/, "") + `/store?storeId=${storeId}`
+      );
+
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      console.error("[SizeBot] Failed to load store settings:", err);
+      return null;
+    }
+  }
 
   if (!storeId) {
     console.warn(
@@ -383,6 +394,33 @@
   modal.appendChild(chatContainer);
   modal.appendChild(inputWrapper);
   document.body.appendChild(modal);
+
+  button.style.display = "none";
+
+  (async function init() {
+    const settings = await fetchStoreSettings();
+
+    if (!settings || settings.enabled === false) {
+      console.warn("[SizeBot] Widget disabled for store:", storeId);
+      return;
+    }
+
+    // APPLY THEME COLOR
+    const theme = settings.themeColor || "#111827";
+    button.style.background = theme;
+    button.style.display = "flex";
+
+    // APPLY TITLE / SUBTITLE
+    titleLine.textContent = settings.title || "Size Assistant";
+    subtitleLine.textContent =
+      settings.subtitle || "Tell me what fits you well.";
+
+    // default brand (optional future feature)
+    window.__SIZEBOT_DEFAULT_BRAND__ = settings.defaultBrand || null;
+
+    // Show widget after settings load
+    button.style.display = "flex";
+  })();
 
   // Greeting
   addBotMessage(
