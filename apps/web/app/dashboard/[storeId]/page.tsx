@@ -1,39 +1,35 @@
-// apps/web/src/app/dashboard/[storeId]/page.tsx
-import { notFound } from "next/navigation";
-import { getStoreById } from "@repo/core";
-import StoreSettingsForm from "./StoreSettingsForm";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+// apps/web/app/dashboard/[storeId]/page.tsx
 
-export async function getCurrentUserId() {
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
-  return user?.id || null;
+import { getCurrentUserId, getStoreAnalytics, getStoreById } from "@repo/core";
+import { notFound } from "next/navigation";
+import DashboardClient from "./DashboardClient";
+
+interface Props {
+  params: { storeId: string };
 }
 
-type Props = {
-  params: { storeId: string };
-};
-
 export default async function StoreDashboardPage({ params }: Props) {
-  const resolvedParams = await params;
   const userId = await getCurrentUserId();
+  const resolvedParams = await params;
   const store = await getStoreById(resolvedParams.storeId);
 
-  if (!store || store.owner_id !== userId) {
-    return notFound();
-  }
+  if (!store || store.owner_id !== userId) return notFound();
+
+  // Fetch analytics (you will implement next)
+  const analytics = await getStoreAnalytics(resolvedParams.storeId);
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-10 space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{store.name}</h1>
-        <p className="text-xs text-gray-500">
-          Store ID: {store.id}
-          {store.domain ? ` • ${store.domain}` : ""}
-        </p>
+    <div className="max-w-6xl mx-auto py-10 px-4">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-semibold tracking-tight mb-6">
+          {store.name} — Overview
+        </h1>
+        <button className="mb-6 px-4 py-2 shadow-sm text-black rounded">
+          Settings
+        </button>
       </div>
 
-      <StoreSettingsForm store={store} />
-    </main>
+      <DashboardClient store={store} analytics={analytics} />
+    </div>
   );
 }

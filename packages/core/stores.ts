@@ -87,3 +87,31 @@ export async function createStore(
   if (error) throw error;
   return data;
 }
+
+// apps/web/lib/store.ts
+
+export async function getStoreAnalytics(storeId: string) {
+  return {
+    totalChats: 120,
+    monthChats: 34,
+    uniqueUsers: 56,
+    change7Days: 12, // % change
+
+    daily: {
+      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      values: [5, 9, 14, 11, 7, 18, 10],
+    },
+
+    topBrands: [
+      { brand: "Nike", count: 22 },
+      { brand: "Adidas", count: 18 },
+      { brand: "Puma", count: 9 },
+    ],
+
+    topQueries: [
+      { text: "Nike size 9 fits me", count: 12 },
+      { text: "Adidas shoes sizing", count: 7 },
+      { text: "What is universal size?", count: 5 },
+    ],
+  };
+}

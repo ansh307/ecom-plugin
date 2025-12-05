@@ -1,4 +1,5 @@
 export * from "./stores";
+export * from "./users";
 
 import { supabase } from "./supabase";
 
