@@ -1,9 +1,9 @@
 // POST /api/chat
 
-import { corsResponse, corsPreflight } from "lib/cors";
+import { corsResponse, corsPreflight } from "../../../lib/cors";
 import { convertUserMessage, parseMessage } from "@repo/size-engine";
 import { validateStore } from "@repo/core";
-import { supabase } from "lib/supabase";
+import { supabase } from "../../../lib/supabase";
 
 export async function OPTIONS() {
   // Required for browser preflight (CORS)

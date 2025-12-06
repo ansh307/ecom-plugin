@@ -514,7 +514,7 @@
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ storeId, message: text }),
+        body: JSON.stringify({ storeId, message: text, sessionId }),
       });
 
       const data = await res.json();
