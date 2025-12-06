@@ -1,8 +1,9 @@
 // POST /api/chat
 
-import { corsResponse, corsPreflight } from "../../../lib/cors";
-import { convertUserMessage } from "@repo/size-engine";
+import { corsResponse, corsPreflight } from "lib/cors";
+import { convertUserMessage, parseMessage } from "@repo/size-engine";
 import { validateStore } from "@repo/core";
+import { supabase } from "lib/supabase";
 
 export async function OPTIONS() {
   // Required for browser preflight (CORS)
@@ -12,10 +13,13 @@ export async function OPTIONS() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { storeId, message } = body;
+    const { storeId, message, sessionId } = body;
 
-    if (!storeId || !message) {
-      return corsResponse({ error: "Missing storeId or message" }, 400);
+    if (!storeId || !message || !sessionId) {
+      return corsResponse(
+        { error: "Missing storeId, message, or sessionId" },
+        400
+      );
     }
 
     // Validate store
@@ -26,6 +30,14 @@ export async function POST(req: Request) {
 
     // Convert using size engine
     const reply = await convertUserMessage(message);
+    const { brand, size } = parseMessage(message);
+    if (brand) {
+      await supabase.from("brand_mentions").insert({
+        store_id: storeId,
+        session_id: sessionId,
+        brand,
+      });
+    }
 
     return corsResponse({ reply });
   } catch (err) {

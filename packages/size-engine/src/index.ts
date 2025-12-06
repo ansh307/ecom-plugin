@@ -3,6 +3,8 @@
 import { parseMessage } from "./parser";
 import { convertSize } from "./engine";
 
+export * from "./parser";
+
 export { convertSize };
 
 export function convertUserMessage(message: string) {

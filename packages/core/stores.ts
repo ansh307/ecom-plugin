@@ -88,30 +88,145 @@ export async function createStore(
   return data;
 }
 
-// apps/web/lib/store.ts
-
 export async function getStoreAnalytics(storeId: string) {
+  // ----------------------------------
+  // 1️⃣ Total Chats
+  // ----------------------------------
+  const totalChatsRes = await supabase
+    .from("chats")
+    .select("*", { count: "exact", head: true })
+    .eq("store_id", storeId);
+
+  const totalChats = totalChatsRes.count ?? 0;
+
+  // ----------------------------------
+  // 2️⃣ Unique Users (distinct session_id)
+  // ----------------------------------
+  const uniqueUsersRes = await supabase
+    .from("chats")
+    .select("session_id", { count: "exact", head: false })
+    .eq("store_id", storeId);
+
+  const uniqueUsers = new Set(
+    uniqueUsersRes.data?.map((r) => r.session_id) ?? []
+  ).size;
+
+  // ----------------------------------
+  // 3️⃣ Chats in Last 30 Days
+  // ----------------------------------
+  const monthChatsRes = await supabase
+    .from("chats")
+    .select("*", { count: "exact", head: true })
+    .eq("store_id", storeId)
+    .gte("created_at", getDaysAgo(30));
+
+  const monthChats = monthChatsRes.count ?? 0;
+
+  // ----------------------------------
+  // 4️⃣ Chats last 7 days
+  // ----------------------------------
+  const last7Res = await supabase
+    .from("chats")
+    .select("*", { count: "exact", head: true })
+    .eq("store_id", storeId)
+    .gte("created_at", getDaysAgo(7));
+
+  const last7 = last7Res.count ?? 0;
+
+  // Previous 7 days
+  const prev7Res = await supabase
+    .from("chats")
+    .select("*", { count: "exact", head: true })
+    .eq("store_id", storeId)
+    .gte("created_at", getDaysAgo(14))
+    .lt("created_at", getDaysAgo(7));
+
+  const prev7 = prev7Res.count ?? 0;
+
+  const change7Days =
+    prev7 === 0 ? 100 : Math.round(((last7 - prev7) / prev7) * 100);
+
+  // ----------------------------------
+  // 5️⃣ Daily Chat Counts (Last 14 Days)
+  // ----------------------------------
+  const dailyRowsRes = await supabase
+    .from("chats")
+    .select("created_at")
+    .eq("store_id", storeId)
+    .gte("created_at", getDaysAgo(14))
+    .order("created_at", { ascending: true });
+
+  const daily = aggregateDaily(dailyRowsRes.data ?? []);
+
+  // ----------------------------------
+  // 6️⃣ Top Brands
+  // ----------------------------------
+  const topBrandsRes = await supabase
+    .from("brand_mentions")
+    .select("brand, count")
+    .eq("store_id", storeId)
+    .order("count", { ascending: false })
+    .limit(5);
+
+  const topBrands =
+    topBrandsRes.data?.map((r) => ({ brand: r.brand, count: r.count })) ?? [];
+
+  // ----------------------------------
+  // 7️⃣ Top Queries (Group by message)
+  // Supabase doesn't support GROUP BY natively → use RPC or manual count
+  // Here is the *safe manual approach*
+  // ----------------------------------
+
+  const queriesRes = await supabase
+    .from("chats")
+    .select("message")
+    .eq("store_id", storeId)
+    .eq("sender", "user");
+
+  const messageMap: Record<string, number> = {};
+
+  queriesRes.data?.forEach((row) => {
+    if (!row.message) return;
+    messageMap[row.message] = (messageMap[row.message] || 0) + 1;
+  });
+
+  const topQueries = Object.entries(messageMap)
+    .map(([text, count]) => ({ text, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  // ----------------------------------
   return {
-    totalChats: 120,
-    monthChats: 34,
-    uniqueUsers: 56,
-    change7Days: 12, // % change
+    totalChats,
+    monthChats,
+    uniqueUsers,
+    change7Days,
 
-    daily: {
-      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      values: [5, 9, 14, 11, 7, 18, 10],
-    },
+    daily,
+    topBrands,
+    topQueries,
+  };
+}
 
-    topBrands: [
-      { brand: "Nike", count: 22 },
-      { brand: "Adidas", count: 18 },
-      { brand: "Puma", count: 9 },
-    ],
+// Helpers ----------------------------------
 
-    topQueries: [
-      { text: "Nike size 9 fits me", count: 12 },
-      { text: "Adidas shoes sizing", count: 7 },
-      { text: "What is universal size?", count: 5 },
-    ],
+function getDaysAgo(days: number) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+}
+
+function aggregateDaily(rows: { created_at: string }[]) {
+  const counts: Record<string, number> = {};
+
+  rows.forEach((row) => {
+    const day = row.created_at.split("T")[0];
+    if (!day) return;
+    counts[day] = (counts[day] ?? 0) + 1;
+  });
+
+  const sortedDays = Object.keys(counts).sort();
+
+  return {
+    labels: sortedDays,
+    values: sortedDays.map((d) => counts[d]),
   };
 }

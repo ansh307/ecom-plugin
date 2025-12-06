@@ -5,6 +5,12 @@
   if (window.__SIZEBOT_WIDGET_LOADED__) return;
   window.__SIZEBOT_WIDGET_LOADED__ = true;
 
+  // ------------------------------
+  // ⭐ ADD SESSION ID HERE
+  // ------------------------------
+  const sessionId = crypto.randomUUID();
+  window.__SIZEBOT_SESSION__ = sessionId;
+
   // 1. Identify the script tag that loaded this file
   const currentScript =
     document.currentScript ||
@@ -458,7 +464,36 @@
     }
   }
 
-  button.addEventListener("click", toggleModal);
+  // analytics event
+  async function sendEvent(eventType) {
+    fetch(apiBase + "/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        storeId,
+        sessionId,
+        eventType,
+      }),
+    });
+  }
+
+  async function sendChatMessage(message, sender) {
+    fetch(apiBase + "/analytics/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        storeId,
+        sessionId,
+        sender,
+        message,
+      }),
+    });
+  }
+
+  button.addEventListener("click", () => {
+    sendEvent("open");
+    toggleModal();
+  });
   closeBtn.addEventListener("click", () => {
     modal.style.display = "none";
   });
@@ -468,6 +503,7 @@
     const text = input.value.trim();
     if (!text) return;
 
+    sendChatMessage(text, "user");
     input.value = "";
     addUserMessage(text);
     const typingEl = addTypingIndicator();
@@ -490,6 +526,7 @@
       }
 
       addBotMessage(data.reply);
+      sendChatMessage(data.reply, "bot");
     } catch (err) {
       console.error("[SizeBot] Chat error:", err);
       removeTypingIndicator();
