@@ -161,15 +161,32 @@ export async function getStoreAnalytics(storeId: string) {
   // ----------------------------------
   // 6️⃣ Top Brands
   // ----------------------------------
-  const topBrandsRes = await supabase
+  // ----------------------------------
+  // 6️⃣ Top Brands (Manually grouped)
+  // ----------------------------------
+  const brandRowsRes = await supabase
     .from("brand_mentions")
-    .select("brand, count")
-    .eq("store_id", storeId)
-    .order("count", { ascending: false })
-    .limit(5);
+    .select("brand")
+    .eq("store_id", storeId);
 
-  const topBrands =
-    topBrandsRes.data?.map((r) => ({ brand: r.brand, count: r.count })) ?? [];
+  const brandMap: Record<string, number> = {};
+
+  brandRowsRes.data?.forEach((row) => {
+    if (!row.brand) return;
+
+    // normalize brands to consistent casing
+    const key = row.brand.trim().toLowerCase();
+
+    brandMap[key] = (brandMap[key] ?? 0) + 1;
+  });
+
+  const topBrands = Object.entries(brandMap)
+    .map(([brand, count]) => ({
+      brand,
+      count,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
 
   // ----------------------------------
   // 7️⃣ Top Queries (Group by message)
