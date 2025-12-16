@@ -13,8 +13,8 @@ export const featuresData: FeatureItem[] = [
     desc: "Recommend the perfect size across brands using real fit data, size charts, and customer inputs to reduce returns.",
   },
   {
-    title: "AI Outfit & Product Recommendations",
-    desc: "Suggest matching outfits and better alternatives automatically to increase confidence and average order value.",
+    title: "AI Product Recommendations",
+    desc: "Suggest matching outfits automatically to increase confidence and average order value.",
   },
   {
     title: "1-Line Installation",

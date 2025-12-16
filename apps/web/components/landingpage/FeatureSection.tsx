@@ -20,18 +20,17 @@ export default function FeatureSection() {
           {/* Card 1 - Large */}
           <div className="md:col-span-2 row-span-2 p-10 border border-gray-200 rounded-3xl  hover:shadow-lg transition">
             <h3 className="text-2xl font-semibold mb-4">
-              AI-Powered Size Recommendations
+              {featuresData[0]?.title}
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Precision sizing tailored to each customer using machine learning
-              and product attributes.
+              {featuresData[0]?.desc}
             </p>
           </div>
 
           {/* Card 2 */}
           <div className="p-8 border border-gray-200 rounded-3xl bg-white hover:shadow-lg transition">
             <h3 className="text-xl font-semibold mb-3">
-              Smart Product Suggestions
+              {featuresData[1]?.title}
             </h3>
             <p className="text-gray-600">{featuresData[1]?.desc}</p>
           </div>
@@ -39,7 +38,7 @@ export default function FeatureSection() {
           {/* Card 3 */}
           <div className="p-8 row-span-2 border border-gray-200 rounded-3xl bg-white hover:shadow-lg transition">
             <h3 className="text-xl font-semibold mb-3">
-              Customizable Widget UI
+              {featuresData[4]?.title}
             </h3>
             <p className="text-gray-600">{featuresData[4]?.desc}</p>
           </div>
@@ -47,21 +46,23 @@ export default function FeatureSection() {
           {/* Card 4 - Wide */}
           <div className="md:col-span-2 p-10 border border-gray-200 rounded-3xl hover:shadow-lg transition">
             <h3 className="text-2xl font-semibold mb-4">
-              Insightful Analytics Dashboard
+              {featuresData[2]?.title}
             </h3>
-            <p className="text-gray-600">{featuresData[3]?.desc}</p>
+            <p className="text-gray-600">{featuresData[2]?.desc}</p>
           </div>
 
           {/* Card 5 */}
           <div className=" p-8 border border-gray-200 rounded-3xl bg-white hover:shadow-lg transition">
-            <h3 className="text-xl font-semibold mb-3">1-Line Installation</h3>
-            <p className="text-gray-600">{featuresData[2]?.desc}</p>
+            <h3 className="text-xl font-semibold mb-3">
+              {featuresData[3]?.title}
+            </h3>
+            <p className="text-gray-600">{featuresData[3]?.desc}</p>
           </div>
 
           {/* Card 6 */}
           <div className="col-span-2 p-8 border border-gray-200 rounded-3xl bg-white hover:shadow-lg transition">
             <h3 className="text-xl font-semibold mb-3">
-              Blazing-Fast Performance
+              {featuresData[5]?.title}
             </h3>
             <p className="text-gray-600">{featuresData[5]?.desc}</p>
           </div>
